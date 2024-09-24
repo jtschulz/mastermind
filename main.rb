@@ -17,23 +17,37 @@ COLORS = %w(
 secret_code = Array.new(4) { COLORS.sample }
 puts(secret_code)
 
-puts("Make a guess, space-separated")
-puts("Options: r b y g p o")
-first_guess = gets.chomp.split(" ")
+def check(secret_code, guess)
+  cloned_code = secret_code.clone
 
-pegs = []
-cloned_code = secret_code.clone
-
-first_guess.each_with_index do |letter, idx|
-  if cloned_code[idx] == letter
-    cloned_code[idx] = "black"
+  guess.each_with_index do |letter, idx|
+    if cloned_code[idx] == letter
+      cloned_code[idx] = "black"
+    end
   end
+
+  guess.each do |letter|
+    if cloned_code.include?(letter)
+      cloned_code[cloned_code.index(letter)] = "white"
+    end
+  end
+
+  cloned_code.filter { |l| ["black", "white"].include?(l) }.sort
 end
 
-first_guess.each do |letter|
-  if cloned_code.include?(letter)
-    cloned_code[cloned_code.index(letter)] = "white"
+attempt = 0
+while attempt < 10
+  puts("Make a guess, space-separated")
+  puts("Options: r b y g p o")
+  guess = gets.chomp.split(" ")
+  res = check(secret_code, guess)
+  if res == ["black"] * 4
+    puts "you win! 🤘"
+    exit
   end
+  puts res
+  attempt += 1
+  puts "#{10 - attempt} tries left"
 end
 
-puts(cloned_code.filter { |l| ["black", "white"].include?(l) }.sort)
+puts "you lose 💀"
